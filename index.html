@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultra Pro Max Hindi-HTML ↔ English-HTML Converter</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #0078d7;
+      --secondary: #6c757d;
+      --dark: #1e1e1e;
+      --light: #f8f9fa;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --info: #17a2b8;
+      --editor-bg: #282a36;
+      --sidebar-bg: #252526;
+      --highlight: #ff5722;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--dark);
+      color: #e0e0e0;
+      line-height: 1.6;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 0.5rem 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      border-bottom: 1px solid #444;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85rem;
+      background-color: #333;
+      color: #fff;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-warning {
+      background-color: var(--warning);
+      color: #333;
+    }
+
+    .btn-info {
+      background-color: var(--info);
+      color: white;
+    }
+
+    .btn-highlight {
+      background-color: var(--highlight);
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .editor-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .editor-box {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #444;
+      background-color: var(--editor-bg);
+      transition: all 0.3s ease;
+    }
+
+    .editor-box.collapsed {
+      flex: 0;
+      min-width: 0 !important;
+      overflow: hidden;
+    }
+
+    .editor-header {
+      background-color: var(--sidebar-bg);
+      color: #ccc;
+      padding: 0.4rem 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #444;
+    }
+
+    .editor-title {
+      font-weight: 500;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .editor-body {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .CodeMirror {
+      height: 100% !important;
+      font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .status-bar {
+      background-color: var(--sidebar-bg);
+      color: #aaa;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #444;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Tooltip styles */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 120px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -60px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.75rem;
+      border: 1px solid #555;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--success);
+      color: white;
+      padding: 0.8rem 1.2rem;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      font-size: 0.9rem;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Toggle buttons */
+    .toggle-buttons {
+      position: absolute;
+      top: 50%;
+      right: -15px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 10;
+    }
+
+    .toggle-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: var(--sidebar-bg);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid #555;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .toggle-btn:hover {
+      background-color: var(--primary);
+    }
+
+    /* Settings panel */
+    .settings-panel {
+      position: fixed;
+      top: 0;
+      right: -350px;
+      width: 350px;
+      height: 100vh;
+      background-color: var(--sidebar-bg);
+      z-index: 100;
+      transition: right 0.3s ease;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+    }
+
+    .settings-panel.open {
+      right: 0;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #444;
+    }
+
+    .settings-title {
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .close-settings {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .settings-group {
+      margin-bottom: 20px;
+    }
+
+    .settings-group-title {
+      font-size: 0.9rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .setting-item {
+      margin-bottom: 15px;
+    }
+
+    .setting-label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.85rem;
+    }
+
+    .setting-select, .setting-input {
+      width: 100%;
+      padding: 8px;
+      background-color: #333;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: white;
+    }
+
+    .setting-checkbox {
+      margin-right: 8px;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 99;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    /* Mobile specific styles */
+    @media (max-width: 768px) {
+      .editor-container {
+        flex-direction: column;
+      }
+      
+      .editor-box {
+        border-right: none;
+        border-bottom: 1px solid #444;
+      }
+      
+      .controls {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 8px;
+      }
+      
+      button {
+        flex: 1;
+        padding: 0.4rem;
+        font-size: 0.75rem;
+      }
+      
+      h1 {
+        font-size: 1.1rem;
+      }
+
+      .settings-panel {
+        width: 90%;
+        right: -90%;
+      }
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #2d2d2d;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #666;
+    }
+
+    /* Highlight matching tags */
+    .CodeMirror-matchingtag {
+      background-color: rgba(255, 150, 0, 0.3);
+    }
+
+    /* Search box */
+    .search-box {
+      position: absolute;
+      top: 40px;
+      right: 20px;
+      background-color: var(--sidebar-bg);
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 50;
+      display: none;
+    }
+
+    .search-box.active {
+      display: block;
+    }
+
+    .search-input {
+      width: 250px;
+      padding: 8px;
+      background-color: #333;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: white;
+      margin-bottom: 5px;
+    }
+
+    .search-controls {
+      display: flex;
+      gap: 5px;
+    }
+
+    /* Preview panel */
+    .preview-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 550px;
+      background-color: white;
+      z-index: 90;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      border-top: 2px solid var(--primary);
+    }
+
+    .preview-container.open {
+      transform: translateY(0);
+    }
+
+    .preview-header {
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 8px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-title {
+      font-size: 0.9rem;
+    }
+
+    .preview-close {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .preview-content {
+      width: 100%;
+      height: calc(100% - 36px);
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="header-content">
+        <h1>
+          <span class="logo"><i class="fas fa-code"></i></span>
+          Ultra Pro Max HTML Converter
+        </h1>
+        <div class="controls">
+          <button class="btn-primary" id="convertBtn">
+            <i class="fas fa-exchange-alt"></i> Convert
+          </button>
+          <button class="btn-success" id="copyBtn">
+            <i class="far fa-copy"></i> Copy
+          </button>
+          <button class="btn-secondary" id="clearBtn">
+            <i class="far fa-trash-alt"></i> Clear
+          </button>
+          <button class="btn-danger" id="downloadBtn">
+            <i class="fas fa-download"></i> Download
+          </button>
+          <button class="btn-info" id="previewBtn">
+            <i class="fas fa-eye"></i> Preview
+          </button>
+          <button class="btn-highlight" id="settingsBtn">
+            <i class="fas fa-cog"></i> Settings
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="editor-container">
+        <div class="editor-box" id="hindiEditorBox">
+          <div class="editor-header">
+            <div class="editor-title">
+              <i class="fas fa-language"></i> Hindi HTML
+            </div>
+            <div class="editor-actions">
+              <button class="btn-secondary" id="hindiExampleBtn" title="Load Hindi Example">
+                <i class="fas fa-lightbulb"></i> Example
+              </button>
+              <button class="btn-warning" id="hindiSearchBtn" title="Search in Hindi Editor">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="editor-body">
+            <textarea id="hindiHtml"><sirsak>Mera Pehla Web Page</sirsak>
+<vibhag pehchan="mukhya">
+  <shirshak>Mera Pehla Heading</shirshak>
+  <anuched>Yah ek anuched hai jo HTML mein likha gaya hai.</anuched>
+  <chitra src="pratibimb.jpg" alt="Pratibimb" uchai="300" chorai="400" />
+</vibhag></textarea>
+          </div>
+          <div class="status-bar">
+            <div class="status-item">
+              <i class="fas fa-font"></i>
+              <span id="hindiCharCount">0</span> chars
+            </div>
+            <div class="status-item">
+              <i class="fas fa-grip-lines"></i>
+              <span id="hindiLineCount">1</span> lines
+            </div>
+            <div class="status-item">
+              <i class="fas fa-code"></i>
+              <span>UTF-8</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-buttons">
+          <button class="toggle-btn" id="toggleHindi" title="Toggle Hindi Editor">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="toggle-btn" id="toggleEnglish" title="Toggle English Editor">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="editor-box" id="englishEditorBox">
+          <div class="editor-header">
+            <div class="editor-title">
+              <i class="fas fa-code"></i> English HTML
+            </div>
+            <div class="editor-actions">
+              <button class="btn-secondary" id="englishExampleBtn" title="Load English Example">
+                <i class="fas fa-lightbulb"></i> Example
+              </button>
+              <button class="btn-warning" id="englishSearchBtn" title="Search in English Editor">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="editor-body">
+            <textarea id="englishHtml" readonly></textarea>
+          </div>
+          <div class="status-bar">
+            <div class="status-item">
+              <i class="fas fa-font"></i>
+              <span id="englishCharCount">0</span> chars
+            </div>
+            <div class="status-item">
+              <i class="fas fa-grip-lines"></i>
+              <span id="englishLineCount">1</span> lines
+            </div>
+            <div class="status-item">
+              <i class="fas fa-code"></i>
+              <span>HTML</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Search Box -->
+  <div class="search-box" id="searchBox">
+    <input type="text" class="search-input" placeholder="Search...">
+    <div class="search-controls">
+      <button class="btn-secondary" id="searchPrevBtn"><i class="fas fa-arrow-up"></i></button>
+      <button class="btn-secondary" id="searchNextBtn"><i class="fas fa-arrow-down"></i></button>
+      <button class="btn-secondary" id="searchReplaceBtn"><i class="fas fa-exchange-alt"></i></button>
+      <button class="btn-danger" id="searchCloseBtn"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+
+  <!-- Preview Panel -->
+  <div class="preview-container" id="previewPanel">
+    <div class="preview-header">
+      <div class="preview-title">HTML Preview</div>
+      <button class="preview-close" id="previewCloseBtn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <iframe class="preview-content" id="previewFrame"></iframe>
+  </div>
+
+  <!-- Settings Panel -->
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-header">
+      <div class="settings-title"><i class="fas fa-cog"></i> Settings</div>
+      <button class="close-settings" id="closeSettingsBtn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="settings-group">
+      <div class="settings-group-title"><i class="fas fa-paint-brush"></i> Editor Appearance</div>
+      
+      <div class="setting-item">
+        <label class="setting-label">Theme</label>
+        <select class="setting-select" id="themeSelect">
+          <option value="dracula">Dracula</option>
+          <option value="material">Material</option>
+          <option value="monokai">Monokai</option>
+          <option value="solarized">Solarized</option>
+          <option value="eclipse">Eclipse</option>
+        </select>
+      </div>
+      
+      <div class="setting-item">
+        <label class="setting-label">Font Size</label>
+        <select class="setting-select" id="fontSizeSelect">
+          <option value="12px">Small</option>
+          <option value="14px" selected>Medium</option>
+          <option value="16px">Large</option>
+          <option value="18px">Extra Large</option>
+        </select>
+      </div>
+      
+      <div class="setting-item">
+        <label class="setting-label">Tab Size</label>
+        <select class="setting-select" id="tabSizeSelect">
+          <option value="2">2 spaces</option>
+          <option value="4" selected>4 spaces</option>
+          <option value="8">8 spaces</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="settings-group">
+      <div class="settings-group-title"><i class="fas fa-code"></i> Editor Behavior</div>
+      
+      <div class="setting-item">
+        <input type="checkbox" class="setting-checkbox" id="lineNumbersCheck" checked>
+        <label class="setting-label">Show Line Numbers</label>
+      </div>
+      
+      <div class="setting-item">
+        <input type="checkbox" class="setting-checkbox" id="autoCloseTagsCheck" checked>
+        <label class="setting-label">Auto Close Tags</label>
+      </div>
+      
+      <div class="setting-item">
+        <input type="checkbox" class="setting-checkbox" id="matchTagsCheck" checked>
+        <label class="setting-label">Highlight Matching Tags</label>
+      </div>
+      
+      <div class="setting-item">
+        <input type="checkbox" class="setting-checkbox" id="lineWrappingCheck" checked>
+        <label class="setting-label">Line Wrapping</label>
+      </div>
+    </div>
+    
+    <div class="settings-group">
+      <div class="settings-group-title"><i class="fas fa-language"></i> Translation Settings</div>
+      
+      <div class="setting-item">
+        <label class="setting-label">Auto-Convert Delay (ms)</label>
+        <input type="number" class="setting-input" id="autoConvertDelay" value="500" min="100" max="5000">
+      </div>
+      
+      <div class="setting-item">
+        <input type="checkbox" class="setting-checkbox" id="autoConvertCheck" checked>
+        <label class="setting-label">Enable Auto-Convert</label>
+      </div>
+    </div>
+    
+    <div class="settings-group">
+      <div class="settings-group-title"><i class="fas fa-keyboard"></i> Shortcuts</div>
+      
+      <div class="setting-item">
+        <label class="setting-label">Convert: Ctrl+Enter</label>
+      </div>
+      
+      <div class="setting-item">
+        <label class="setting-label">Copy: Ctrl+Shift+C</label>
+      </div>
+      
+      <div class="setting-item">
+        <label class="setting-label">Search: Ctrl+F</label>
+      </div>
+      
+      <div class="setting-item">
+        <label class="setting-label">Settings: Ctrl+,</label>
+      </div>
+      <button class="btn-primary" id="applySettingsBtn" style="width: 100%; margin-top: 20px;">
+        <i class="fas fa-save"></i> Apply Settings
+      </button>
+    </div>
+  </div>
+ 
+  <div class="overlay" id="overlay"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- CodeMirror and other libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closetag.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/html-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/xml-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/comment/comment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/search.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/searchcursor.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/jump-to-line.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/xml-fold.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/keymap/sublime.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/dialog/dialog.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/solarized.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/eclipse.min.css">
+
+  <script>
+   // Initialize CodeMirror editors with enhanced features
+let hindiEditor, englishEditor;
+let debounceTimer;
+let isAutoConvertEnabled = true;
+let autoConvertDelay = 500;
+
+// Enhanced Hindi to English HTML conversion mapping
+const hindiToEnglishMap = {
+  // Basic tags
+  '<sirsak>': '<title>', '</sirsak>': '</title>',
+  '<box>': '<div>', '</box>': '</div>',
+  '<p>': '<p>', '</p>': '</p>',
+  '<pic>': '<img ', '</pic>': '',
+  '<h1>': '<h1>', '</h1>': '</h1>',
+  '<h2>': '<h2>', '</h2>': '</h2>',
+  '<soochi>': '<ul>', '</soochi>': '</ul>',
+  '<l>': '<li>', '</l>': '</li>',
+  '<kadi>': '<table>', '</kadi>': '</table>',
+  '<kadi-pankti>': '<tr>', '</kadi-pankti>': '</tr>',
+  '<kadi-kosh>': '<td>', '</kadi-kosh>': '</td>',
+  '<kadi-shirshak>': '<th>', '</kadi-shirshak>': '</th>',
+  '<sandarbh>': '<a ', '</sandarbh>': '</a>',
+  '<roop>': '<form>', '</roop>': '</form>',
+  '<input>': '<input>', '</input>': '',
+  '<batan>': '<button>', '</batan>': '</button>',
+  '<shaili>': '<style>', '</shaili>': '</style>',
+  '<skript>': '&lt;script&gt;', '</skript>': '&lt;/script&gt;',
+  '<shirorekha>': '<hr>', '</shirorekha>': '',
+  '<pankti>': '<br>', '</pankti>': '',
+  '<mool>': '<html>', '</mool>': '</html>',
+  '<shir>': '<head>', '</shir>': '</head>',
+  '<sharir>': '<body>', '</sharir>': '</body>',
+  '<meta>': '<meta>', '</meta>': '',
+  '<peethika>': '<footer>', '</peethika>': '</footer>',
+  '<upar>': '<header>', '</upar>': '</header>',
+  '<nav>': '<nav>', '</nav>': '</nav>',
+  '<aspaas>': '<aside>', '</aspaas>': '</aside>',
+  '<mukhya>': '<main>', '</mukhya>': '</main>',
+  '<chhota>': '<small>', '</chhota>': '</small>',
+  '<bal>': '<strong>', '</bal>': '</strong>',
+  '<pragati>': '<progress>', '</pragati>': '</progress>',
+  '<chehara>': '<span>', '</chehara>': '</span>',
+  '<chhapa>': '<picture>', '</chhapa>': '</picture>',
+  '<srot>': '<source>', '</srot>': '</source>',
+  '<awaz>': '<audio>', '</awaz>': '</audio>',
+  '<video>': '<video>', '</video>': '</video>',
+  '<canvas>': '<canvas>', '</canvas>': '</canvas>',
+  '<vigyapan>': '<details>', '</vigyapan>': '</details>',
+  '<suchi>': '<summary>', '</suchi>': '</summary>',
+  '<samay>': '<time>', '</samay>': '</time>',
+  '<chunao>': '<select>', '</chunao>': '</select>',
+  '<vikalp>': '<option>', '</vikalp>': '</option>',
+  '<maidan>': '<fieldset>', '</maidan>': '</fieldset>',
+  '<legend>': '<legend>', '</legend>': '</legend>',
+  '<lekh>': '<label>', '</lekh>': '</label>',
+  '<datalist>': '<datalist>', '</datalist>': '</datalist>',
+  '<output>': '<output>', '</output>': '</output>',
+  '<meter>': '<meter>', '</meter>': '</meter>',
+  
+  // Attributes
+  'pehchan=': 'id=',
+  'varg=': 'class=',
+  'sthal=': 'href=',
+  'src=': 'src=',
+  'uchai=': 'height=',
+  'chorai=': 'width=',
+  'alt=': 'alt=',
+  'naam=': 'name=',
+  'prakar=': 'type=',
+  'moolya=': 'value=',
+  'niyukt': 'required',
+  'chuna': 'selected',
+  'avyakt=': 'placeholder=',
+  'shuruaat=': 'start=',
+  'rekha=': 'border=',
+  'shaili=': 'style=',
+  'udgam=': 'srcset=',
+  'lambai=': 'maxlength=',
+  'chhota-akshar=': 'min=',
+  'bada-akshar=': 'max=',
+  'sankhya=': 'step=',
+  'nishchit=': 'checked',
+  'avarodh=': 'disabled',
+  'sirf-padhne=': 'readonly',
+  'sanket=': 'pattern=',
+  'sankhya=': 'number=',
+  'sankhya=': 'tabindex=',
+  'lekh=': 'title=',
+  'data=': 'data-',
+  'aria=': 'aria-',
+  'role=': 'role=',
+  'target=': 'target=',
+  'download=': 'download=',
+  'rel=': 'rel=',
+  'media=': 'media=',
+  'sizes=': 'sizes=',
+  'integrity=': 'integrity=',
+  'crossorigin=': 'crossorigin=',
+  'async': 'async',
+  'defer': 'defer',
+  'charset=': 'charset=',
+  'content=': 'content=',
+  'http-equiv=': 'http-equiv=',
+  'property=': 'property=',
+  'itemprop=': 'itemprop=',
+  'itemscope': 'itemscope',
+  'itemtype=': 'itemtype=',
+  'for=': 'for=',
+  'autocomplete=': 'autocomplete=',
+  'autofocus': 'autofocus',
+  'form=': 'form=',
+  'formaction=': 'formaction=',
+  'formenctype=': 'formenctype=',
+  'formmethod=': 'formmethod=',
+  'formnovalidate': 'formnovalidate',
+  'formtarget=': 'formtarget=',
+  'list=': 'list=',
+  'multiple': 'multiple',
+  'novalidate': 'novalidate',
+  'sandbox=': 'sandbox=',
+  'spellcheck=': 'spellcheck=',
+  'wrap=': 'wrap=',
+  'controls': 'controls',
+  'loop': 'loop',
+  'muted': 'muted',
+  'poster=': 'poster=',
+  'preload=': 'preload=',
+  'autoplay': 'autoplay',
+  'colspan=': 'colspan=',
+  'rowspan=': 'rowspan=',
+  'headers=': 'headers=',
+  'scope=': 'scope=',
+  'open': 'open',
+  'reversed': 'reversed',
+  'datetime=': 'datetime=',
+  'pubdate': 'pubdate',
+  'manifest=': 'manifest=',
+  'codebase=': 'codebase=',
+  'archive=': 'archive=',
+  'object=': 'object=',
+  'usemap=': 'usemap=',
+  'shape=': 'shape=',
+  'coords=': 'coords=',
+  'nohref': 'nohref',
+  'hreflang=': 'hreflang=',
+  'ping=': 'ping=',
+  'referrerpolicy=': 'referrerpolicy=',
+  'sizes=': 'sizes=',
+  'imagesizes=': 'imagesizes=',
+  'imagesrcset=': 'imagesrcset=',
+  'ismap': 'ismap',
+  'loading=': 'loading=',
+  'decoding=': 'decoding=',
+  'fetchpriority=': 'fetchpriority=',
+  'importance=': 'importance=',
+  'intrinsicsize=': 'intrinsicsize=',
+  'allow=': 'allow=',
+  'allowfullscreen': 'allowfullscreen',
+  'allowpaymentrequest': 'allowpaymentrequest',
+  'credentialless': 'credentialless',
+  'csp=': 'csp=',
+  'srcdoc=': 'srcdoc=',
+  'srclang=': 'srclang=',
+  'default': 'default',
+  'kind=': 'kind=',
+  'label=': 'label=',
+  'scoped': 'scoped',
+  'seamless': 'seamless',
+  'typemustmatch': 'typemustmatch',
+  'valuetype=': 'valuetype=',
+  'declare': 'declare',
+  'classid=': 'classid=',
+  'code=': 'code=',
+  'codetype=': 'codetype=',
+  'data=': 'data=',
+  'standby=': 'standby=',
+  'align=': 'align=',
+  'behavior=': 'behavior=',
+  'bgcolor=': 'bgcolor=',
+  'direction=': 'direction=',
+  'hspace=': 'hspace=',
+  'language=': 'language=',
+  'vspace=': 'vspace=',
+  'noshade': 'noshade',
+  'nowrap': 'nowrap',
+  'compact': 'compact',
+  'declare': 'declare',
+  'valuetype=': 'valuetype=',
+  'axis=': 'axis=',
+  'char=': 'char=',
+  'charoff=': 'charoff=',
+  'clear=': 'clear=',
+  'frame=': 'frame=',
+  'rules=': 'rules=',
+  'summary=': 'summary=',
+  'accept=': 'accept=',
+  'accept-charset=': 'accept-charset=',
+  'enctype=': 'enctype=',
+  'method=': 'method=',
+  'novalidate': 'novalidate'
+};
+
+// English to Hindi HTML conversion mapping (for bidirectional conversion)
+const englishToHindiMap = Object.fromEntries(
+  Object.entries(hindiToEnglishMap).map(([hindi, english]) => [english, hindi])
+);
+
+// Initialize the application
+function initApp() {
+  // Create editors with premium features
+  createEditors();
+  
+  // Load saved settings
+  loadSettings();
+  
+  // Set up event listeners
+  setupEventListeners();
+  
+  // Initialize stats
+  updateStats();
+  
+  // Trigger initial conversion
+  convertCode();
+  
+  // Show welcome message
+  setTimeout(() => {
+    showToast('Welcome to Ultra Pro Max HTML Converter!', 'success');
+  }, 1000);
+}
+
+// Create CodeMirror editors with all premium features
+function createEditors() {
+  // Hindi Editor (Editable)
+  hindiEditor = CodeMirror.fromTextArea(document.getElementById('hindiHtml'), {
+    mode: 'htmlmixed',
+    theme: 'dracula',
+    lineNumbers: true,
+    autoCloseTags: true,
+    autoCloseBrackets: true,
+    matchTags: {bothTags: true},
+    foldGutter: true,
+    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+    lineWrapping: true,
+    indentUnit: 4,
+    tabSize: 4,
+    extraKeys: {
+      "Ctrl-Space": "autocomplete",
+      "Ctrl-Enter": convertCode,
+      "Ctrl-F": "findPersistent",
+      "Ctrl-H": "replace",
+      "Ctrl-Q": function(cm) { cm.foldCode(cm.getCursor()); },
+      "Ctrl-/": "toggleComment",
+      "Ctrl-,": openSettings,
+      "Ctrl-Shift-C": copyToClipboard,
+      "Ctrl-S": downloadHTML,
+      "Ctrl-Alt-H": convertBackToHindi,
+      "Shift-Tab": "indentLess",
+      "Tab": "indentMore",
+      "Ctrl-L": "selectLine",
+      "Ctrl-D": function(cm) {
+        const cursor = cm.getCursor();
+        const word = cm.findWordAt(cursor);
+        cm.setSelection(word.anchor, word.head);
+      },
+      "Alt-F": "findPersistent",
+      "Alt-G": "jumpToLine",
+      "Ctrl-K": function(cm) {
+        cm.setOption("keyMap", "sublime");
+        showToast("Sublime keymap activated", "info");
+      }
+    },
+    lint: true,
+    indentWithTabs: false,
+    electricChars: true,
+    showCursorWhenSelecting: true,
+    styleActiveLine: true,
+    highlightSelectionMatches: {showToken: /\w/},
+    hintOptions: {
+      completeSingle: false,
+      alignWithWord: true,
+      closeCharacters: /[\s()\[\]{};:>,]/,
+      schemaInfo: {
+        "!top": ["html", "head", "body"],
+        "html": ["head", "body"],
+        "head": ["title", "meta", "link", "style", "script"],
+        "body": ["div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "table", "tr", "td", "th", "img", "a", "form", "input", "button", "span", "br", "hr"]
+      }
+    }
+  });
+
+  // English Editor (Read-only)
+  englishEditor = CodeMirror.fromTextArea(document.getElementById('englishHtml'), {
+    mode: 'htmlmixed',
+    theme: 'dracula',
+    lineNumbers: true,
+    readOnly: true,
+    matchTags: {bothTags: true},
+    foldGutter: true,
+    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+    lineWrapping: true,
+    indentUnit: 4,
+    tabSize: 4,
+    extraKeys: {
+      "Ctrl-F": "findPersistent",
+      "Ctrl-Shift-C": copyToClipboard,
+      "Ctrl-S": downloadHTML,
+      "Ctrl-Alt-H": convertBackToHindi,
+      "Ctrl-Q": function(cm) { cm.foldCode(cm.getCursor()); }
+    },
+    lint: true,
+    styleActiveLine: true,
+    highlightSelectionMatches: {showToken: /\w/}
+  });
+
+  // Set up change event for auto-conversion
+  hindiEditor.on('change', () => {
+    updateStats();
+    if (isAutoConvertEnabled) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        convertCode();
+      }, autoConvertDelay);
+    }
+  });
+
+  // Set up cursor activity for highlighting matching tags
+  hindiEditor.on('cursorActivity', function() {
+    if (hindiEditor.getOption('matchTags')) {
+      CodeMirror.matchTags(hindiEditor, true);
+    }
+  });
+
+  englishEditor.on('cursorActivity', function() {
+    if (englishEditor.getOption('matchTags')) {
+      CodeMirror.matchTags(englishEditor, true);
+    }
+  });
+
+  // Set up error checking
+  hindiEditor.on('change', function() {
+    const errors = validateHTML(hindiEditor.getValue());
+    if (errors.length > 0) {
+      showLintErrors(errors);
+    } else {
+      clearLintErrors();
+    }
+  });
+}
+
+// Enhanced HTML validation
+function validateHTML(code) {
+  const errors = [];
+  const stack = [];
+  const tagRegex = /<\/?([a-zA-Z-]+)[^>]*>/g;
+  const selfClosingTags = ['img', 'br', 'hr', 'meta', 'input', 'link'];
+  let match;
+  
+  // Check for unclosed tags
+  while ((match = tagRegex.exec(code)) !== null) {
+    const tag = match[1].toLowerCase();
+    const isOpening = !match[0].startsWith('</');
+    
+    if (isOpening && !selfClosingTags.includes(tag)) {
+      stack.push(tag);
+    } else if (!isOpening) {
+      if (stack.length === 0) {
+        errors.push({
+          from: CodeMirror.Pos(0, match.index),
+          to: CodeMirror.Pos(0, match.index + match[0].length),
+          message: `Unmatched closing tag: ${tag}`
+        });
+      } else {
+        const lastTag = stack.pop();
+        if (lastTag !== tag) {
+          errors.push({
+            from: CodeMirror.Pos(0, match.index),
+            to: CodeMirror.Pos(0, match.index + match[0].length),
+            message: `Mismatched tags: expected </${lastTag}> but found </${tag}>`
+          });
+        }
+      }
+    }
+  }
+  
+  // Check for unclosed tags
+  if (stack.length > 0) {
+    stack.forEach(tag => {
+      errors.push({
+        from: CodeMirror.Pos(hindiEditor.lastLine(), 0),
+        to: CodeMirror.Pos(hindiEditor.lastLine(), 0),
+        message: `Unclosed tag: <${tag}>`
+      });
+    });
+  }
+  
+  // Check for common errors
+  if (code.includes('<img') && !code.includes('alt=')) {
+    errors.push({
+      from: CodeMirror.Pos(0, code.indexOf('<img')),
+      to: CodeMirror.Pos(0, code.indexOf('<img') + 4),
+      message: 'Image missing alt attribute'
+    });
+  }
+  
+  if (code.includes('<a') && !code.includes('href=')) {
+    errors.push({
+      from: CodeMirror.Pos(0, code.indexOf('<a')),
+      to: CodeMirror.Pos(0, code.indexOf('<a') + 2),
+      message: 'Anchor missing href attribute'
+    });
+  }
+  
+  return errors;
+}
+
+// Show lint errors in editor
+function showLintErrors(errors) {
+  hindiEditor.setOption('lint', {
+    getAnnotations: function() {
+      return errors.map(error => ({
+        from: error.from,
+        to: error.to,
+        message: error.message,
+        severity: 'error'
+      }));
+    },
+    async: true,
+    delay: 500
+  });
+}
+
+// Clear lint errors
+function clearLintErrors() {
+  hindiEditor.setOption('lint', false);
+}
+
+// Enhanced conversion function with bidirectional support and error handling
+function convertHTML(code, direction = 'hindiToEnglish') {
+  try {
+    let convertedCode = code;
+    const conversionMap = direction === 'hindiToEnglish' ? hindiToEnglishMap : englishToHindiMap;
+    
+    // Replace all known tags and attributes
+    for (const [source, target] of Object.entries(conversionMap)) {
+      const regex = new RegExp(source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      convertedCode = convertedCode.replace(regex, target);
+    }
+    
+    // Special handling for self-closing tags
+    if (direction === 'hindiToEnglish') {
+      convertedCode = convertedCode.replace(/<chitra([^>]*)\s*\/?>/g, '<img$1 />');
+      convertedCode = convertedCode.replace(/<input([^>]*)\s*\/?>/g, '<input$1 />');
+      convertedCode = convertedCode.replace(/<shirorekha\s*\/?>/g, '<hr />');
+      convertedCode = convertedCode.replace(/<pankti\s*\/?>/g, '<br />');
+      convertedCode = convertedCode.replace(/<meta([^>]*)\s*\/?>/g, '<meta$1 />');
+    } else {
+      convertedCode = convertedCode.replace(/<img([^>]*)\s*\/?>/g, '<chitra$1></chitra>');
+      convertedCode = convertedCode.replace(/<input([^>]*)\s*\/?>/g, '<input$1></input>');
+      convertedCode = convertedCode.replace(/<hr\s*\/?>/g, '<shirorekha></shirorekha>');
+      convertedCode = convertedCode.replace(/<br\s*\/?>/g, '<pankti></pankti>');
+      convertedCode = convertedCode.replace(/<meta([^>]*)\s*\/?>/g, '<meta$1></meta>');
+    }
+    
+    // Format the code with proper indentation
+    convertedCode = formatHTML(convertedCode);
+    
+    return convertedCode;
+  } catch (error) {
+    showToast(`Conversion error: ${error.message}`, 'error');
+    return code;
+  }
+}
+
+// Format HTML with proper indentation
+function formatHTML(html) {
+  let formatted = '';
+  let indent = 0;
+  const lines = html.split('\n');
+  const selfClosingTags = ['img', 'br', 'hr', 'meta', 'input', 'link'];
+  
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    
+    // Decrease indent for closing tags
+    if (trimmed.startsWith('</')) {
+      indent--;
+    }
+    
+    // Add current indent
+    formatted += '  '.repeat(Math.max(0, indent)) + trimmed + '\n';
+    
+    // Increase indent for opening tags (except self-closing)
+    if (trimmed.startsWith('<') && !trimmed.startsWith('</') && 
+        !trimmed.endsWith('/>') && !selfClosingTags.some(tag => trimmed.startsWith(`<${tag}`))) {
+      indent++;
+    }
+  });
+  
+  return formatted;
+}
+
+// Convert code between Hindi and English
+function convertCode() {
+  const hindiCode = hindiEditor.getValue();
+  const englishCode = convertHTML(hindiCode, 'hindiToEnglish');
+  englishEditor.setValue(englishCode);
+  updateStats();
+  showToast('Code converted successfully!', 'success');
+  
+  // Update preview
+  updatePreview();
+}
+
+// Convert English back to Hindi
+function convertBackToHindi() {
+  const englishCode = englishEditor.getValue();
+  const hindiCode = convertHTML(englishCode, 'englishToHindi');
+  hindiEditor.setValue(hindiCode);
+  updateStats();
+  showToast('Converted back to Hindi!', 'info');
+}
+
+// Copy to clipboard with enhanced functionality
+function copyToClipboard() {
+  const englishCode = englishEditor.getValue();
+  if (englishCode.trim() === '') {
+    showToast('Nothing to copy!', 'warning');
+    return;
+  }
+  
+  // Create a temporary textarea to copy from
+  const textarea = document.createElement('textarea');
+  textarea.value = englishCode;
+  document.body.appendChild(textarea);
+  textarea.select();
+  
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      showToast('Copied to clipboard!', 'success');
+    } else {
+      throw new Error('Copy command failed');
+    }
+  } catch (err) {
+    // Fallback to Clipboard API if available
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(englishCode)
+        .then(() => showToast('Copied to clipboard!', 'success'))
+        .catch(() => showToast('Failed to copy: ' + err, 'error'));
+    } else {
+      showToast('Failed to copy: ' + err, 'error');
+    }
+  }
+  
+  document.body.removeChild(textarea);
+}
+
+// Clear editors with confirmation
+function clearEditors() {
+  if (hindiEditor.getValue().trim() === '' && englishEditor.getValue().trim() === '') {
+    return;
+  }
+  
+  if (confirm('Are you sure you want to clear both editors?')) {
+    hindiEditor.setValue('');
+    englishEditor.setValue('');
+    updateStats();
+    showToast('Editors cleared!', 'info');
+    document.getElementById('previewFrame').srcdoc = '';
+    clearLintErrors();
+  }
+}
+
+// Download HTML file with enhanced options
+function downloadHTML() {
+  const englishCode = englishEditor.getValue();
+  if (englishCode.trim() === '') {
+    showToast('Nothing to download!', 'warning');
+    return;
+  }
+  
+  const filename = prompt('Enter file name (without extension):', 'converted') || 'converted';
+  const blob = new Blob([englishCode], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filename}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('File downloaded!', 'success');
+}
+
+// Update character and line counts
+function updateStats() {
+  const hindiContent = hindiEditor.getValue();
+  const englishContent = englishEditor.getValue();
+  
+  document.getElementById('hindiCharCount').textContent = hindiContent.length.toLocaleString();
+  document.getElementById('englishCharCount').textContent = englishContent.length.toLocaleString();
+  
+  document.getElementById('hindiLineCount').textContent = hindiEditor.lineCount().toLocaleString();
+  document.getElementById('englishLineCount').textContent = englishEditor.lineCount().toLocaleString();
+}
+
+// Show/hide preview panel
+function togglePreview() {
+  const previewPanel = document.getElementById('previewPanel');
+  previewPanel.classList.toggle('open');
+  if (previewPanel.classList.contains('open')) {
+    updatePreview();
+  }
+}
+
+// Update the preview iframe with error handling
+function updatePreview() {
+  const englishCode = englishEditor.getValue();
+  const previewFrame = document.getElementById('previewFrame');
+  
+  try {
+    previewFrame.srcdoc = englishCode;
+  } catch (error) {
+    showToast('Preview update failed: ' + error.message, 'error');
+  }
+}
+
+// Show/hide settings panel
+function openSettings() {
+  document.getElementById('settingsPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('active');
+}
+
+function closeSettings() {
+  document.getElementById('settingsPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
+}
+
+// Toggle editor visibility with animation
+function toggleEditor(editorId) {
+  const editorBox = document.getElementById(editorId);
+  editorBox.classList.toggle('collapsed');
+  
+  // Force refresh of CodeMirror instances
+  setTimeout(() => {
+    hindiEditor.refresh();
+    englishEditor.refresh();
+  }, 300);
+}
+
+// Initialize search functionality with enhanced features
+function initSearch(editor) {
+  const searchBox = document.getElementById('searchBox');
+  const searchInput = searchBox.querySelector('.search-input');
+  
+  searchBox.classList.add('active');
+  searchInput.focus();
+  
+  // Search previous
+  document.getElementById('searchPrevBtn').onclick = () => {
+    editor.execCommand('findPrevious');
+  };
+  
+  // Search next
+  document.getElementById('searchNextBtn').onclick = () => {
+    editor.execCommand('findNext');
+  };
+  
+  // Replace
+  document.getElementById('searchReplaceBtn').onclick = () => {
+    const replace = prompt('Replace with:');
+    if (replace !== null) {
+      editor.execCommand('replace', replace);
+    }
+  };
+  
+  // Close search
+  document.getElementById('searchCloseBtn').onclick = () => {
+    searchBox.classList.remove('active');
+    editor.focus();
+  };
+  
+  // Handle search input
+  searchInput.oninput = () => {
+    editor.execCommand('find', searchInput.value);
+  };
+  
+  // Handle key events
+  searchInput.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      editor.execCommand('findNext');
+    } else if (e.key === 'Escape') {
+      searchBox.classList.remove('active');
+      editor.focus();
+    }
+  };
+}
+
+// Show toast notification with multiple options
+function showToast(message, type = 'info', duration = 3000) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast show';
+  
+  // Set color based on type
+  switch(type) {
+    case 'success': 
+      toast.style.backgroundColor = 'var(--success)'; 
+      break;
+    case 'error': 
+      toast.style.backgroundColor = 'var(--danger)'; 
+      break;
+    case 'warning': 
+      toast.style.backgroundColor = 'var(--warning)';
+      toast.style.color = '#333';
+      break;
+    case 'info': 
+      toast.style.backgroundColor = 'var(--info)';
+      break;
+    default: 
+      toast.style.backgroundColor = 'var(--secondary)';
+  }
+  
+  // Hide after duration
+  setTimeout(() => {
+    toast.className = 'toast';
+  }, duration);
+}
+
+// Apply editor settings with validation
+function applyEditorSettings() {
+  try {
+    const theme = document.getElementById('themeSelect').value;
+    const fontSize = document.getElementById('fontSizeSelect').value;
+    const tabSize = parseInt(document.getElementById('tabSizeSelect').value);
+    const lineNumbers = document.getElementById('lineNumbersCheck').checked;
+    const autoCloseTags = document.getElementById('autoCloseTagsCheck').checked;
+    const matchTags = document.getElementById('matchTagsCheck').checked;
+    const lineWrapping = document.getElementById('lineWrappingCheck').checked;
+    const autoConvertDelayInput = parseInt(document.getElementById('autoConvertDelay').value);
+    const autoConvert = document.getElementById('autoConvertCheck').checked;
+    
+    // Validate auto-convert delay
+    if (isNaN(autoConvertDelayInput)) {
+  throw new Error('Auto-convert delay must be a number');
+}
+
+    
+    autoConvertDelay = Math.max(100, Math.min(5000, autoConvertDelayInput));
+    document.getElementById('autoConvertDelay').value = autoConvertDelay;
+    isAutoConvertEnabled = autoConvert;
+    
+    // Apply to both editors
+    [hindiEditor, englishEditor].forEach(editor => {
+      editor.setOption('theme', theme);
+      editor.setOption('lineNumbers', lineNumbers);
+      editor.setOption('lineWrapping', lineWrapping);
+      editor.setOption('matchTags', matchTags);
+      editor.getWrapperElement().style.fontSize = fontSize;
+    });
+    
+    // Apply only to hindi editor
+    hindiEditor.setOption('autoCloseTags', autoCloseTags);
+    hindiEditor.setOption('tabSize', tabSize);
+    hindiEditor.setOption('indentUnit', tabSize);
+    
+    // Save settings to localStorage
+    const settings = {
+      theme,
+      fontSize,
+      tabSize,
+      lineNumbers,
+      autoCloseTags,
+      matchTags,
+      lineWrapping,
+      autoConvertDelay,
+      autoConvert
+    };
+    localStorage.setItem('htmlConverterSettings', JSON.stringify(settings));
+    
+    showToast('Settings saved successfully!', 'success');
+  } catch (error) {
+    showToast(`Settings error: ${error.message}`, 'error');
+  }
+}
+
+// Load saved settings with defaults
+function loadSettings() {
+  try {
+    const defaultSettings = {
+      theme: 'dracula',
+      fontSize: '14px',
+      tabSize: 4,
+      lineNumbers: true,
+      autoCloseTags: true,
+      matchTags: true,
+      lineWrapping: true,
+      autoConvertDelay: 500,
+      autoConvert: true
+    };
+    
+    const savedSettings = localStorage.getItem('htmlConverterSettings');
+    const settings = savedSettings ? JSON.parse(savedSettings) : defaultSettings;
+    
+    // Apply settings to UI controls
+    document.getElementById('themeSelect').value = settings.theme;
+    document.getElementById('fontSizeSelect').value = settings.fontSize;
+    document.getElementById('tabSizeSelect').value = settings.tabSize;
+    document.getElementById('lineNumbersCheck').checked = settings.lineNumbers;
+    document.getElementById('autoCloseTagsCheck').checked = settings.autoCloseTags;
+    document.getElementById('matchTagsCheck').checked = settings.matchTags;
+    document.getElementById('lineWrappingCheck').checked = settings.lineWrapping;
+    document.getElementById('autoConvertDelay').value = settings.autoConvertDelay;
+    document.getElementById('autoConvertCheck').checked = settings.autoConvert;
+    
+    // Apply settings to editors
+    applyEditorSettings();
+  } catch (error) {
+    showToast(`Failed to load settings: ${error.message}`, 'error');
+  }
+}
+
+// Set up all event listeners
+function setupEventListeners() {
+  // Main buttons
+  document.getElementById('convertBtn').addEventListener('click', convertCode);
+  document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+  document.getElementById('clearBtn').addEventListener('click', clearEditors);
+  document.getElementById('downloadBtn').addEventListener('click', downloadHTML);
+  document.getElementById('previewBtn').addEventListener('click', togglePreview);
+  document.getElementById('previewCloseBtn').addEventListener('click', togglePreview);
+  document.getElementById('settingsBtn').addEventListener('click', openSettings);
+  document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+  document.getElementById('overlay').addEventListener('click', closeSettings);
+  
+  // Editor toggle buttons
+  document.getElementById('toggleHindi').addEventListener('click', () => toggleEditor('hindiEditorBox'));
+  document.getElementById('toggleEnglish').addEventListener('click', () => toggleEditor('englishEditorBox'));
+  
+  // Search buttons
+  document.getElementById('hindiSearchBtn').addEventListener('click', () => initSearch(hindiEditor));
+  document.getElementById('englishSearchBtn').addEventListener('click', () => initSearch(englishEditor));
+  
+  // Settings apply button
+  document.getElementById('applySettingsBtn').addEventListener('click', applyEditorSettings);
+  
+  // Example buttons
+  document.getElementById('hindiExampleBtn').addEventListener('click', loadHindiExample);
+  document.getElementById('englishExampleBtn').addEventListener('click', loadEnglishExample);
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    // Ctrl+Enter to convert
+    if (e.ctrlKey && e.key === 'Enter') {
+      e.preventDefault();
+      convertCode();
+    }
+    
+    // Ctrl+Shift+C to copy
+    if (e.ctrlKey && e.shiftKey && e.key === 'c') {
+      e.preventDefault();
+      copyToClipboard();
+    }
+    
+    // Ctrl+F to search in active editor
+    if (e.ctrlKey && e.key === 'f') {
+      e.preventDefault();
+      const activeEditor = document.activeElement === hindiEditor.getInputField() ? hindiEditor : englishEditor;
+      initSearch(activeEditor);
+    }
+    
+    // Ctrl+, to open settings
+    if (e.ctrlKey && e.key === ',') {
+      e.preventDefault();
+      openSettings();
+    }
+    
+    // Ctrl+S to download
+    if (e.ctrlKey && e.key === 's') {
+      e.preventDefault();
+      downloadHTML();
+    }
+  });
+}
+
+// Load Hindi example
+function loadHindiExample() {
+  const exampleCode = `<mool>
+  <shir>
+    <meta charset="UTF-8" />
+    <sirsak>Mera Udyaan</sirsak>
+    <shaili>
+      .container { max-width: 800px; margin: 0 auto; }
+      h1 { color: green; }
+    </shaili>
+  </shir>
+  <sharir>
+    <vibhag varg="container" pehchan="mukhya">
+      <shirshak>Mera Priya Udyaan</shirshak>
+      <anuched>Yah udyaan bahut sundar hai aur yahaan anek prakar ke ped-paudhe hain.</anuched>
+      
+      <soochi>
+        <soochi-vaastu>Amrood</soochi-vaastu>
+        <soochi-vaastu>Santra</soochi-vaastu>
+        <soochi-vaastu>Kela</soochi-vaastu>
+      </soochi>
+
+      <chitra src="udyaan.jpg" alt="Mera Udyaan" uchai="500" chorai="800" />
+
+      <sandarbh sthal="https://example.com">Adhik jankari</sandarbh>
+
+      <roop>
+        <anuched>Apna naam likhe:</anuched>
+        <input prakhar="text" naam="username" avyakt="Naam likhe" niyukt />
+        <batan prakhar="submit">Bheje</batan>
+        
+        <anuched>Apni pasand chune:</anuched>
+        <input prakhar="radio" naam="pasand" moolya="phool" id="phool" />
+        <lekh for="phool">Phool</lekh>
+        <input prakhar="radio" naam="pasand" moolya="ped" id="ped" />
+        <lekh for="ped">Ped</lekh>
+        
+        <anuched>Apni umra chune:</anuched>
+        <chunao naam="umra">
+          <vikalp moolya="10-20">10-20 varsh</vikalp>
+          <vikalp moolya="20-30">20-30 varsh</vikalp>
+          <vikalp moolya="30+">30+ varsh</vikalp>
+        </chunao>
+        
+        <maidan>
+          <legend>Vishesh sujhav</legend>
+          <textarea naam="sujhav" avyakt="Apne sujhav likhe"></textarea>
+        </maidan>
+      </roop>
+
+      <kadi rekha="1">
+        <kadi-shirshak>
+          <kadi-kosh>Ped ka naam</kadi-kosh>
+          <kadi-kosh>Fal</kadi-kosh>
+          <kadi-kosh>Mausam</kadi-kosh>
+        </kadi-shirshak>
+        <kadi-pankti>
+          <kadi-kosh>Aam</kadi-kosh>
+          <kadi-kosh>Mango</kadi-kosh>
+          <kadi-kosh>Garmi</kadi-kosh>
+        </kadi-pankti>
+        <kadi-pankti>
+          <kadi-kosh>Seb</kadi-kosh>
+          <kadi-kosh>Apple</kadi-kosh>
+          <kadi-kosh>Sheet</kadi-kosh>
+        </kadi-pankti>
+      </kadi>
+
+      <awaz controls>
+        <srot src="garden.mp3" prakhar="audio/mpeg">
+        Aapka browser awaz ko support nahi karta.
+      </awaz>
+
+      <video controls chorai="600" uchai="400">
+        <srot src="garden.mp4" prakhar="video/mp4">
+        Aapka browser video ko support nahi karta.
+      </video>
+
+      <pragati moolya="70" max="100">70% pura</pragati>
+
+      <vigyapan>
+        <suchi>Udyaan ke niyam</suchi>
+        <anuched>
+          1. Pedon ko na todo<br>
+          2. Phoolon ko na todo<br>
+          3. Kachra dustbin mein daale
+        </anuched>
+      </vigyapan>
+
+      <peethika>
+        <anuched>© 2023 Mera Udyaan. Sabhi adhikar surakshit.</anuched>
+        <sandarbh sthal="#upar">Upar jaye</sandarbh>
+      </peethika>
+    </vibhag>
+  </sharir>
+</mool>`;
+      
+  hindiEditor.setValue(exampleCode);
+  updateStats();
+  showToast('Hindi example loaded!', 'info');
+}
+function loadEnglishExample() {
+  const exampleCode = `<!DOCTYPE html>
+  <html>
+  <head>
+    <title>My Garden</title>
+    <style>
+      .container { max-width: 800px; margin: 0 auto; }
+      h1 { color: green; }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="main">
+      <h1>My Favorite Garden</h1>
+      <p>This garden is very beautiful with many types of plants.</p>
+      
+      <ul>
+        <li>Guava</li>
+        <li>Orange</li>
+        <li>Banana</li>
+      </ul>
+    </div>
+  </body>
+  </html>`;
+  
+  englishEditor.setValue(exampleCode);
+  updateStats();
+  showToast('English example loaded!', 'info');
+}
+// At the very end of your script, add:
+document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
