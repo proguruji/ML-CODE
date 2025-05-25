@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ultra Pro Max Hindi-HTML ↔ English-HTML Converter</title>
+  <title>ML CODE</title>
+  <!-- Favicon for all browsers -->
+<link rel="icon" href="images/icon.ico" sizes="any">
+<link rel="shortcut icon" href="images/icon.ico" type="image/x-icon">
+
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,7 +41,11 @@
       height: 100vh;
       overflow: hidden;
     }
-
+    .icon{
+      width: 40px;
+      
+      
+    }
     .app-container {
       display: flex;
       flex-direction: column;
@@ -488,7 +497,7 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 550px;
+      height: 100%;
       background-color: white;
       z-index: 90;
       transform: translateY(100%);
@@ -525,6 +534,192 @@
       height: calc(100% - 36px);
       border: none;
     }
+    /* Enhanced Preview Styles */
+.preview-toolbar {
+  background-color: var(--sidebar-bg);
+  padding: 8px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #444;
+}
+
+.preview-device-options {
+  display: flex;
+  gap: 8px;
+}
+
+.device-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.device-btn.active {
+  background-color: var(--primary);
+}
+
+.device-btn i {
+  font-size: 0.9rem;
+}
+
+.preview-content-container {
+  position: relative;
+  height: calc(100% - 36px);
+  width: 100%;
+  overflow: auto;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.preview-device {
+  background-color: white;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin: 20px 0;
+}
+
+.preview-device::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  z-index: 1;
+}
+
+.preview-device::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 5px;
+  background-color: #ddd;
+  border-radius: 5px;
+}
+
+.preview-device.mobile {
+  width: 375px;
+  height: 667px;
+  border-radius: 30px;
+  border: 10px solid #222;
+}
+
+.preview-device.tablet {
+  width: 768px;
+  height: 800px;
+  border-radius: 20px;
+  border: 15px solid #222;
+}
+
+.preview-device.laptop {
+  width: 1024px;
+  height: 650px;
+  border-radius: 10px;
+  border: 20px solid #222;
+}
+
+.preview-device.desktop {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+.preview-frame {
+  border: none;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 30px);
+}
+
+.preview-rotate-btn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+}
+
+/* Responsive adjustments for the preview panel */
+@media (max-width: 1024px) {
+  .preview-device.laptop {
+    width: 800px;
+    height: 600px;
+  }
+}
+
+@media (max-width: 900px) {
+  .preview-device.tablet {
+    width: 700px;
+    height: 900px;
+  border-radius: 15px;
+  border-width: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .preview-device.tablet,
+  .preview-device.laptop {
+    width: 95%;
+    height: 90vh;
+    border: none;
+    border-radius: 0;
+  }
+  
+  .preview-content-container {
+    padding: 10px;
+    align-items: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .preview-device.mobile {
+    width: 100%;
+    height: 90vh;
+    border: none;
+    border-radius: 0;
+  }
+  
+  .preview-device-options {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .device-btn {
+    padding: 3px 6px;
+    font-size: 0.7rem;
+  }
+}
   </style>
 </head>
 <body>
@@ -532,8 +727,8 @@
     <header>
       <div class="header-content">
         <h1>
-          <span class="logo"><i class="fas fa-code"></i></span>
-          Ultra Pro Max HTML Converter
+          <span class="logo"><img src="images/icon.ico" alt="icon" class="fa-code icon" ></span>
+          ML CODE
         </h1>
         <div class="controls">
           <button class="btn-primary" id="convertBtn">
@@ -563,7 +758,7 @@
         <div class="editor-box" id="hindiEditorBox">
           <div class="editor-header">
             <div class="editor-title">
-              <i class="fas fa-language"></i> Hindi HTML
+              <i class="fas fa-language"></i>Your Code
             </div>
             <div class="editor-actions">
               <button class="btn-secondary" id="hindiExampleBtn" title="Load Hindi Example">
@@ -610,7 +805,7 @@
         <div class="editor-box" id="englishEditorBox">
           <div class="editor-header">
             <div class="editor-title">
-              <i class="fas fa-code"></i> English HTML
+              <i class="fas fa-code"></i> English Code
             </div>
             <div class="editor-actions">
               <button class="btn-secondary" id="englishExampleBtn" title="Load English Example">
@@ -653,18 +848,42 @@
       <button class="btn-danger" id="searchCloseBtn"><i class="fas fa-times"></i></button>
     </div>
   </div>
-
-  <!-- Preview Panel -->
-  <div class="preview-container" id="previewPanel">
-    <div class="preview-header">
-      <div class="preview-title">HTML Preview</div>
-      <button class="preview-close" id="previewCloseBtn">
-        <i class="fas fa-times"></i>
+<!-- Enhanced Preview Panel -->
+<!-- Enhanced Preview Panel -->
+<div class="preview-container" id="previewPanel">
+  <div class="preview-header">
+    <div class="preview-title">Preview</div>
+    <button class="preview-close" id="previewCloseBtn">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  
+  <div class="preview-toolbar">
+    <div class="preview-device-options">
+      <button class="device-btn active" id="mobilePreviewBtn" title="Mobile View">
+        <i class="fas fa-mobile-alt"></i> Mobile
+      </button>
+      <button class="device-btn" id="tabletPreviewBtn" title="Tablet View">
+        <i class="fas fa-tablet-alt"></i> Tablet
+      </button>
+      <button class="device-btn" id="laptopPreviewBtn" title="Laptop View">
+        <i class="fas fa-laptop"></i> Laptop
+      </button>
+      <button class="device-btn" id="desktopPreviewBtn" title="Desktop View">
+        <i class="fas fa-desktop"></i> Desktop
       </button>
     </div>
-    <iframe class="preview-content" id="previewFrame"></iframe>
   </div>
-
+  
+  <div class="preview-content-container">
+    <div class="preview-device mobile" id="previewDevice">
+      <iframe class="preview-frame" id="previewFrame"></iframe>
+      <button class="preview-rotate-btn" id="rotateBtn">
+        <i class="fas fa-sync-alt"></i> Rotate
+      </button>
+    </div>
+  </div>
+</div>
   <!-- Settings Panel -->
   <div class="settings-panel" id="settingsPanel">
     <div class="settings-header">
@@ -809,198 +1028,119 @@ let autoConvertDelay = 500;
 
 // Enhanced Hindi to English HTML conversion mapping
 const hindiToEnglishMap = {
-  // Basic tags
-  '<sirsak>': '<title>', '</sirsak>': '</title>',
-  '<box>': '<div>', '</box>': '</div>',
-  '<p>': '<p>', '</p>': '</p>',
-  '<pic>': '<img ', '</pic>': '',
-  '<h1>': '<h1>', '</h1>': '</h1>',
-  '<h2>': '<h2>', '</h2>': '</h2>',
-  '<soochi>': '<ul>', '</soochi>': '</ul>',
-  '<l>': '<li>', '</l>': '</li>',
-  '<kadi>': '<table>', '</kadi>': '</table>',
-  '<kadi-pankti>': '<tr>', '</kadi-pankti>': '</tr>',
-  '<kadi-kosh>': '<td>', '</kadi-kosh>': '</td>',
-  '<kadi-shirshak>': '<th>', '</kadi-shirshak>': '</th>',
-  '<sandarbh>': '<a ', '</sandarbh>': '</a>',
-  '<roop>': '<form>', '</roop>': '</form>',
-  '<input>': '<input>', '</input>': '',
-  '<batan>': '<button>', '</batan>': '</button>',
-  '<shaili>': '<style>', '</shaili>': '</style>',
-  '<skript>': '&lt;script&gt;', '</skript>': '&lt;/script&gt;',
-  '<shirorekha>': '<hr>', '</shirorekha>': '',
-  '<pankti>': '<br>', '</pankti>': '',
-  '<mool>': '<html>', '</mool>': '</html>',
-  '<shir>': '<head>', '</shir>': '</head>',
-  '<sharir>': '<body>', '</sharir>': '</body>',
-  '<meta>': '<meta>', '</meta>': '',
-  '<peethika>': '<footer>', '</peethika>': '</footer>',
-  '<upar>': '<header>', '</upar>': '</header>',
-  '<nav>': '<nav>', '</nav>': '</nav>',
-  '<aspaas>': '<aside>', '</aspaas>': '</aside>',
-  '<mukhya>': '<main>', '</mukhya>': '</main>',
-  '<chhota>': '<small>', '</chhota>': '</small>',
-  '<bal>': '<strong>', '</bal>': '</strong>',
-  '<pragati>': '<progress>', '</pragati>': '</progress>',
-  '<chehara>': '<span>', '</chehara>': '</span>',
-  '<chhapa>': '<picture>', '</chhapa>': '</picture>',
-  '<srot>': '<source>', '</srot>': '</source>',
-  '<awaz>': '<audio>', '</awaz>': '</audio>',
-  '<video>': '<video>', '</video>': '</video>',
-  '<canvas>': '<canvas>', '</canvas>': '</canvas>',
-  '<vigyapan>': '<details>', '</vigyapan>': '</details>',
-  '<suchi>': '<summary>', '</suchi>': '</summary>',
-  '<samay>': '<time>', '</samay>': '</time>',
-  '<chunao>': '<select>', '</chunao>': '</select>',
-  '<vikalp>': '<option>', '</vikalp>': '</option>',
-  '<maidan>': '<fieldset>', '</maidan>': '</fieldset>',
-  '<legend>': '<legend>', '</legend>': '</legend>',
-  '<lekh>': '<label>', '</lekh>': '</label>',
-  '<datalist>': '<datalist>', '</datalist>': '</datalist>',
-  '<output>': '<output>', '</output>': '</output>',
-  '<meter>': '<meter>', '</meter>': '</meter>',
+  /* ========== DOCUMENT STRUCTURE ========== */
+  '<mool>': '<html>', '</mool>': '</html>',          // Mool (Root/HTML document)
+  '<sar>': '<head>', '</sar>': '</head>',            // Sar (Head section)
+  '<deh>': '<body>', '</deh>': '</body>',            // Deh (Body content)
+  '<shirsh>': '<title>', '</shirsh>': '</title>',    // Shirshak (Document title)
+  '<sajav>': '<style>', '</sajav>': '</style>',      // Sajav (Style/CSS)
   
-  // Attributes
-  'pehchan=': 'id=',
-  'varg=': 'class=',
-  'sthal=': 'href=',
-  'src=': 'src=',
-  'uchai=': 'height=',
-  'chorai=': 'width=',
-  'alt=': 'alt=',
-  'naam=': 'name=',
-  'prakar=': 'type=',
-  'moolya=': 'value=',
-  'niyukt': 'required',
-  'chuna': 'selected',
-  'avyakt=': 'placeholder=',
-  'shuruaat=': 'start=',
-  'rekha=': 'border=',
-  'shaili=': 'style=',
-  'udgam=': 'srcset=',
-  'lambai=': 'maxlength=',
-  'chhota-akshar=': 'min=',
-  'bada-akshar=': 'max=',
-  'sankhya=': 'step=',
-  'nishchit=': 'checked',
-  'avarodh=': 'disabled',
-  'sirf-padhne=': 'readonly',
-  'sanket=': 'pattern=',
-  'sankhya=': 'number=',
-  'sankhya=': 'tabindex=',
-  'lekh=': 'title=',
-  'data=': 'data-',
-  'aria=': 'aria-',
-  'role=': 'role=',
-  'target=': 'target=',
-  'download=': 'download=',
-  'rel=': 'rel=',
-  'media=': 'media=',
-  'sizes=': 'sizes=',
-  'integrity=': 'integrity=',
-  'crossorigin=': 'crossorigin=',
-  'async': 'async',
-  'defer': 'defer',
-  'charset=': 'charset=',
-  'content=': 'content=',
-  'http-equiv=': 'http-equiv=',
-  'property=': 'property=',
-  'itemprop=': 'itemprop=',
-  'itemscope': 'itemscope',
-  'itemtype=': 'itemtype=',
-  'for=': 'for=',
-  'autocomplete=': 'autocomplete=',
-  'autofocus': 'autofocus',
-  'form=': 'form=',
-  'formaction=': 'formaction=',
-  'formenctype=': 'formenctype=',
-  'formmethod=': 'formmethod=',
-  'formnovalidate': 'formnovalidate',
-  'formtarget=': 'formtarget=',
-  'list=': 'list=',
-  'multiple': 'multiple',
-  'novalidate': 'novalidate',
-  'sandbox=': 'sandbox=',
-  'spellcheck=': 'spellcheck=',
-  'wrap=': 'wrap=',
-  'controls': 'controls',
-  'loop': 'loop',
-  'muted': 'muted',
-  'poster=': 'poster=',
-  'preload=': 'preload=',
-  'autoplay': 'autoplay',
-  'colspan=': 'colspan=',
-  'rowspan=': 'rowspan=',
-  'headers=': 'headers=',
-  'scope=': 'scope=',
-  'open': 'open',
-  'reversed': 'reversed',
-  'datetime=': 'datetime=',
-  'pubdate': 'pubdate',
-  'manifest=': 'manifest=',
-  'codebase=': 'codebase=',
-  'archive=': 'archive=',
-  'object=': 'object=',
-  'usemap=': 'usemap=',
-  'shape=': 'shape=',
-  'coords=': 'coords=',
-  'nohref': 'nohref',
-  'hreflang=': 'hreflang=',
-  'ping=': 'ping=',
-  'referrerpolicy=': 'referrerpolicy=',
-  'sizes=': 'sizes=',
-  'imagesizes=': 'imagesizes=',
-  'imagesrcset=': 'imagesrcset=',
-  'ismap': 'ismap',
-  'loading=': 'loading=',
-  'decoding=': 'decoding=',
-  'fetchpriority=': 'fetchpriority=',
-  'importance=': 'importance=',
-  'intrinsicsize=': 'intrinsicsize=',
-  'allow=': 'allow=',
-  'allowfullscreen': 'allowfullscreen',
-  'allowpaymentrequest': 'allowpaymentrequest',
-  'credentialless': 'credentialless',
-  'csp=': 'csp=',
-  'srcdoc=': 'srcdoc=',
-  'srclang=': 'srclang=',
-  'default': 'default',
-  'kind=': 'kind=',
-  'label=': 'label=',
-  'scoped': 'scoped',
-  'seamless': 'seamless',
-  'typemustmatch': 'typemustmatch',
-  'valuetype=': 'valuetype=',
-  'declare': 'declare',
-  'classid=': 'classid=',
-  'code=': 'code=',
-  'codetype=': 'codetype=',
-  'data=': 'data=',
-  'standby=': 'standby=',
-  'align=': 'align=',
-  'behavior=': 'behavior=',
-  'bgcolor=': 'bgcolor=',
-  'direction=': 'direction=',
-  'hspace=': 'hspace=',
-  'language=': 'language=',
-  'vspace=': 'vspace=',
-  'noshade': 'noshade',
-  'nowrap': 'nowrap',
-  'compact': 'compact',
-  'declare': 'declare',
-  'valuetype=': 'valuetype=',
-  'axis=': 'axis=',
-  'char=': 'char=',
-  'charoff=': 'charoff=',
-  'clear=': 'clear=',
-  'frame=': 'frame=',
-  'rules=': 'rules=',
-  'summary=': 'summary=',
-  'accept=': 'accept=',
-  'accept-charset=': 'accept-charset=',
-  'enctype=': 'enctype=',
-  'method=': 'method=',
-  'novalidate': 'novalidate'
+  '<jan>': '<meta>',                                 // Jan (Metadata)
+
+  /* ========== TEXT ELEMENTS ========== */
+  '<p>': '<p>', '</p>': '</p>',                      // Paragraph
+  '<motu>': '<b>', '</motu>': '</b>',                // Motu (Bold text)
+  '<jor>': '<strong>', '</jor>': '</strong>',        // Jor (Strong importance)
+  '<tedha>': '<i>', '</tedha>': '</i>',              // Tedha (Italic text)
+  '<dhyan>': '<em>', '</dhyan>': '</em>',            // Dhyan (Emphasized text)
+  '<dikh>': '<mark>', '</dikh>': '</mark>',          // Dikhai (Highlighted text)
+  '<chhota>': '<small>', '</chhota>': '</small>',    // Chhota (Smaller text)
+  '<hat>': '<del>', '</hat>': '</del>',              // Hatana (Deleted text)
+  '<jod>': '<ins>', '</jod>': '</ins>',              // Jodna (Inserted text)
+  '<nh>': '<sub>', '</nh>': '</sub>',                // Niche (Subscript)
+  '<up>': '<sup>', '</up>': '</sup>',                // Upar (Superscript)
+  '<same>': '<pre>', '</same>': '</pre>',            // Same (Preformatted text)
+  '<kavita>': '<blockquote>', '</kavita>': '</blockquote>',  // Kavita (Block quotation)
+
+  /* ========== HEADINGS ========== */
+  '<sh1>': '<h1>', '</sh1>': '</h1>',                // Shirsak 1 (Heading 1)
+  '<sh2>': '<h2>', '</sh2>': '</h2>',                // Shirsak 2 (Heading 2)
+  '<sh3>': '<h3>', '</sh3>': '</h3>',                // Shirsak 3 (Heading 3)
+  '<sh4>': '<h4>', '</sh4>': '</h4>',                // Shirsak 4 (Heading 4)
+  '<sh5>': '<h5>', '</sh5>': '</h5>',                // Shirsak 5 (Heading 5)
+  '<sh6>': '<h6>', '</sh6>': '</h6>',                // Shirsak 6 (Heading 6)
+
+  /* ========== MEDIA ========== */
+  '<pic': '<img',                                    // Picture (Image)
+  '<awaz': '<audio', '</awaz>': '</audio>',          // Awaz (Audio content)
+  '<vid': '<video', '</vid>': '</video>',            // Video (Video content)
+  '<todo': '<br',                                    // Todna (Line break)
+  '<rekha': '<hr',                                   // Rekha (Horizontal rule)
+  '<chitr>': '<figure>', '</chitr>': '</figure>',    // Chitra (Figure container)
+  '<caption>': '<figcaption>', '</caption>': '</figcaption>',  // Caption (Figure caption)
+
+  /* ========== LINKS ========== */
+  '<l>': '<a>', '</l>': '</a>',                      // Link (Anchor)
+  '<nav>': '<nav>', '</nav>': '</nav>',              // Navigation
+  '<pata>': '<address>', '</pata>': '</address>',    // Pata (Contact information)
+
+  /* ========== LISTS ========== */
+  '<sardi>': '<ul>', '</sardi>': '</ul>',            // Sardi (Unordered list)
+  '<kram>': '<ol>', '</kram>': '</ol>',              // Kram (Ordered list)
+  '<item>': '<li>', '</item>': '</li>',              // Item (List item)
+  '<vistar>': '<dl>', '</vistar>': '</dl>',          // Vistar (Description list)
+  '<shabd>': '<dt>', '</shabd>': '</dt>',            // Shabd (Description term)
+  '<arth>': '<dd>', '</arth>': '</dd>',              // Arth (Description details)
+
+  /* ========== TABLES ========== */
+  '<kadi>': '<table>', '</kadi>': '</table>',        // Kadi (Table)
+  '<kadi-pankti>': '<tr>', '</kadi-pankti>': '</tr>', // Pankti (Table row)
+  '<kadi-shirshak>': '<th>', '</kadi-shirshak>': '</th>', // Shirshak (Table header)
+  '<kadi-kosh>': '<td>', '</kadi-kosh>': '</td>',    // Kosh (Table cell)
+  '<kadi-sirsh>': '<thead>', '</kadi-sirsh>': '</thead>', // Sirsh (Table head)
+  '<kadi-paon>': '<tfoot>', '</kadi-paon>': '</tfoot>', // Paon (Table foot)
+  '<kadi-deh>': '<tbody>', '</kadi-deh>': '</tbody>', // Deh (Table body)
+
+  /* ========== FORMS ========== */
+  '<prastav>': '<form>', '</prastav>': '</form>',    // Prastav (Form)
+  '<input>': '<input>',                              // Input field
+  '<btn>': '<button>', '</btn>': '</button>',        // Button
+  '<chun>': '<select>', '</chun>': '</select>',      // Chunav (Selection list)
+  '<vikalp>': '<option>', '</vikalp>': '</option>',  // Vikalp (Option)
+  '<lekh>': '<textarea>', '</lekh>': '</textarea>',  // Lekh (Text area)
+  '<group>': '<fieldset>', '</group>': '</fieldset>', // Group (Fieldset)
+  '<label>': '<label>', '</label>': '</label>',       // Label
+  '<output>': '<output>', '</output>': '</output>',   // Output
+
+  /* ========== SEMANTIC ========== */
+  '<upar>': '<header>', '</upar>': '</header>',      // Upar (Header)
+  '<neeche>': '<footer>', '</neeche>': '</footer>',   // Neeche (Footer)
+  '<vibhag>': '<section>', '</vibhag>': '</section>', // Vibhag (Section)
+  '<swatantra>': '<article>', '</swatantra>': '</article>', // Swatantra (Article)
+  '<alag>': '<div>', '</alag>': '</div>',            // Alag (Division)
+  '<span>': '<span>', '</span>': '</span>',           // Span
+  '<main>': '<main>', '</main>': '</main>',           // Main content
+  '<side>': '<aside>', '</side>': '</aside>',         // Side content
+
+  /* ========== SPECIAL ========== */
+  '@dhacha=': '<!DOCTYPE html>',                     // Dhacha (Document type)
+  '<template>': '<template>', '</template>': '</template>', // Template
+  '<slot>': '<slot>', '</slot>': '</slot>',           // Slot
+
+  /* ========== ATTRIBUTES ========== */
+  'pehchan=': 'id=',                                 // Pehchan (Identification)
+  'varg=': 'class=',                                 // Varg (Class)
+  'sthal=': 'href=',                                 // Sthal (Hyperlink reference)
+  'rasta=': 'src=',                                  // Rasta (Source path)
+  'uchai=': 'height=',                               // Uchai (Height)
+  'chorai=': 'width=',                               // Chorai (Width)
+  'vikalp=': 'alt=',                                 // Vikalp (Alternate text)
+  'naam=': 'name=',                                  // Naam (Name)
+  'prakar=': 'type=',                                // Prakar (Type)
+  'bhasa=': 'lang=',                                 // Bhasha (Language)
+  'nisana=': 'target=',                              // Nishana (Target)
+  'khud=': '_self',                                  // Khud (Same tab/window)
+  'dusra=': '_blank',                                // Dusra (New tab/window)
+  'maildo:=': 'mailto:=',                            // Mail karna (Email link)
+  'jao=': '#=',                                      // Jao (Fragment identifier)
+  'lipi=': 'charset=',                               // Lipi (Character encoding)
+  'drashya=': 'viewport=',                           // Drashya (Viewport)
+  'samagri=': 'content=',                            // Samagri (Content)
+  'style=': 'style=',                                // Style
+  'hidden=': 'hidden=',                              // Hidden
+  'required=': 'required=',                          // Required
+  'placeholder=': 'placeholder=',                    // Placeholder text
+  'value=': 'value='                                 // Value
 };
 
 // English to Hindi HTML conversion mapping (for bidirectional conversion)
@@ -1413,6 +1553,7 @@ function togglePreview() {
   const previewPanel = document.getElementById('previewPanel');
   previewPanel.classList.toggle('open');
   if (previewPanel.classList.contains('open')) {
+    setDeviceView('mobile');
     updatePreview();
   }
 }
@@ -1421,13 +1562,77 @@ function togglePreview() {
 function updatePreview() {
   const englishCode = englishEditor.getValue();
   const previewFrame = document.getElementById('previewFrame');
-  
+
   try {
-    previewFrame.srcdoc = englishCode;
+    // Create a Blob URL instead of using srcdoc
+    const blob = new Blob([englishCode], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    previewFrame.src = url;
+
+    // Cleanup old URL after load to prevent memory leaks
+    previewFrame.onload = () => {
+      URL.revokeObjectURL(url);
+    };
   } catch (error) {
     showToast('Preview update failed: ' + error.message, 'error');
   }
 }
+// Enhanced preview variables
+let currentDevice = 'mobile';
+let isRotated = false;
+
+function setDeviceView(device) {
+  currentDevice = device;
+  const previewDevice = document.getElementById('previewDevice');
+  
+  // Remove all device classes
+  previewDevice.classList.remove('mobile', 'tablet', 'laptop', 'desktop');
+  
+  // Add the selected device class
+  previewDevice.classList.add(device);
+  
+  // Update active button
+  document.querySelectorAll('.device-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.getElementById(`${device}PreviewBtn`).classList.add('active');
+  
+  // Reset rotation when changing device
+  if (isRotated) {
+    toggleRotation();
+  }
+  
+  // Update preview to ensure proper sizing
+  setTimeout(updatePreview, 100);
+}
+
+function toggleRotation() {
+  const previewDevice = document.getElementById('previewDevice');
+  isRotated = !isRotated;
+  
+  if (currentDevice === 'mobile' || currentDevice === 'tablet') {
+    if (isRotated) {
+      // Store original dimensions
+      previewDevice.dataset.originalWidth = previewDevice.offsetWidth;
+      previewDevice.dataset.originalHeight = previewDevice.offsetHeight;
+      
+      // Rotate dimensions
+      previewDevice.style.width = previewDevice.offsetHeight + 'px';
+      previewDevice.style.height = previewDevice.offsetWidth + 'px';
+    } else {
+      // Reset to original dimensions
+      previewDevice.style.width = previewDevice.dataset.originalWidth + 'px';
+      previewDevice.style.height = previewDevice.dataset.originalHeight + 'px';
+    }
+  }
+  
+  // Update rotate button icon
+  const rotateBtn = document.getElementById('rotateBtn');
+  rotateBtn.innerHTML = isRotated ? 
+    '<i class="fas fa-undo"></i> Reset' : 
+    '<i class="fas fa-sync-alt"></i> Rotate';
+}
+
 
 // Show/hide settings panel
 function openSettings() {
@@ -1636,6 +1841,14 @@ function setupEventListeners() {
   document.getElementById('settingsBtn').addEventListener('click', openSettings);
   document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
   document.getElementById('overlay').addEventListener('click', closeSettings);
+    // Device preview buttons
+    document.getElementById('mobilePreviewBtn').addEventListener('click', () => setDeviceView('mobile'));
+    document.getElementById('tabletPreviewBtn').addEventListener('click', () => setDeviceView('tablet'));
+    document.getElementById('laptopPreviewBtn').addEventListener('click', () => setDeviceView('laptop'));
+    document.getElementById('desktopPreviewBtn').addEventListener('click', () => setDeviceView('desktop'));
+  
+    // Rotate button
+    document.getElementById('rotateBtn').addEventListener('click', toggleRotation);
   
   // Editor toggle buttons
   document.getElementById('toggleHindi').addEventListener('click', () => toggleEditor('hindiEditorBox'));
